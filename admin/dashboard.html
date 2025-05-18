@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ROA Store</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Load products.js first to ensure products are available -->
+    <script src="../js/products.js"></script>
+    
+    <!-- Emergency fix script to ensure products initialize properly -->
+    <script>
+        // Initialize adminProducts directly from products array
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Emergency fix script running...");
+            
+            // Direct copy from products to adminProducts
+            if (typeof products !== 'undefined' && Array.isArray(products)) {
+                console.log("Found products array with", products.length, "items - copying to adminProducts");
+                
+                // Create global adminProducts variable
+                window.adminProducts = JSON.parse(JSON.stringify(products));
+                
+                // Also store in localStorage as backup
+                localStorage.setItem('adminProducts', JSON.stringify(window.adminProducts));
+                
+                console.log("Successfully copied products to adminProducts");
+            } else {
+                console.warn("Products array not found - admin page may not work correctly");
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="login-section" class="login-section">
+        <div class="login-container">
+            <h2>Admin Login</h2>
+            <div id="login-error" style="color: red; margin-bottom: 10px; display: none;">
+                Invalid credentials. Please try again.
+            </div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required value="admin">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required value="admin123">
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <p style="margin-top: 10px; font-size: 0.85em; color: #666;">
+                    Use username: <strong>admin</strong> and password: <strong>admin123</strong>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="dashboard-section hidden">
+        <nav class="admin-navbar">
+            <div class="nav-brand">
+                <a href="../index.html">
+                    <img src="../images/logo.png" alt="ROA Store Logo" class="nav-logo">
+                </a>
+                <span class="admin-label">Admin Panel</span>
+            </div>
+            <button id="logout-btn" class="btn-secondary" onclick="manualLogout()">Logout</button>
+        </nav>
+
+        <div class="dashboard-container">
+            <h2>Product Management</h2>
+            
+            <div class="action-bar">
+                <button id="add-product-btn" class="btn-primary">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+                <button id="save-products-btn" class="btn-primary" style="margin-left: 10px;" onclick="manualSaveProducts()">
+                    <i class="fas fa-save"></i> Save Products.js
+                </button>
+                <button id="show-debug" class="btn-secondary" style="margin-left: 10px;" onclick="toggleDebug()">
+                    Show Debug Info
+                </button>
+            </div>
+            
+            <div class="info-box" style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #C5A572; color: #333;">
+                <p><strong>Note:</strong> All product changes are stored temporarily. Don't forget to click the "Save Products.js" button after making all your updates to permanently save your changes.</p>
+            </div>
+
+            <div id="debug-info" style="display: none; background-color: #f8f9fa; padding: 10px; margin: 10px 0; border-left: 4px solid #007bff;">
+                <h3>Debug Information</h3>
+                <div id="debug-content"></div>
+                <button onclick="reloadProducts()" class="btn-secondary" style="margin-top: 10px;">Reload Products</button>
+                <button onclick="location.href='fix-admin.html'" class="btn-secondary" style="margin-top: 10px;">Go to Fix Tool</button>
+            </div>
+
+            <div class="products-table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Products will be loaded here -->
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 20px;">Loading products...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div id="product-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3 id="modal-title">Add New Product</h3>
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="product-name">Product Name</label>
+                        <input type="text" id="product-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Price</label>
+                        <input type="text" id="product-price" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Description</label>
+                        <textarea id="product-description" name="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Category</label>
+                        <select id="product-category" name="category" required>
+                            <option value="Bags">Bags</option>
+                            <option value="Luxury">Luxury</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-image">Product Image</label>
+                        <input type="file" id="product-image" name="image" accept="image/*" required>
+                        <p class="help-text" style="color: #666; font-size: 0.85em; margin-top: 5px;">
+                            Take note of the suggested image name after saving. Place your image in the images folder with this name.
+                        </p>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="product-is-new" name="isNew">
+                        <label for="product-is-new">Mark as New Product</label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load admin.js after the DOM is ready -->
+    <script src="admin.js"></script>
+    
+    <!-- Debug script to ensure login works -->
+    <script>
+        // Make sure login form works
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if already logged in
+            if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                // Load products immediately
+                if (typeof loadProductsAndRefreshTable === 'function') {
+                    loadProductsAndRefreshTable();
+                }
+            }
+            
+            // Add direct login handler
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (username === 'admin' && password === 'admin123') {
+                    localStorage.setItem('isAdminLoggedIn', 'true');
+                    document.getElementById('login-section').classList.add('hidden');
+                    document.getElementById('dashboard-section').classList.remove('hidden');
+                    // Load products
+                    if (typeof loadProductsAndRefreshTable === 'function') {
+                        loadProductsAndRefreshTable();
+                    }
+                } else {
+                    document.getElementById('login-error').style.display = 'block';
+                }
+            });
+        });
+        
+        // Manual functions to help when normal handlers fail
+        function manualLogout() {
+            console.log("Manual logout triggered");
+            try {
+                localStorage.removeItem('isAdminLoggedIn');
+                document.getElementById('login-section').classList.remove('hidden');
+                document.getElementById('dashboard-section').classList.add('hidden');
+                console.log("Logout successful");
+            } catch (e) {
+                console.error("Logout failed:", e);
+                alert("Logout failed: " + e.message);
+            }
+        }
+        
+        function manualSaveProducts() {
+            console.log("Manual save triggered");
+            try {
+                if (typeof saveProductsJsFile === 'function') {
+                    saveProductsJsFile();
+                } else {
+                    // Fallback save function
+                    const productsScript = `// Products data - directly defined without localStorage initially
+const products = ${JSON.stringify(window.adminProducts || [], null, 2)};
+
+// Make sure products is available globally
+if (typeof window !== 'undefined') {
+  window.products = products;
+}`;
+                    
+                    const blob = new Blob([productsScript], { type: 'text/javascript' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'products.js';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    alert("Products.js file saved!");
+                }
+            } catch (e) {
+                console.error("Save failed:", e);
+                alert("Save failed: " + e.message);
+            }
+        }
+        
+        function toggleDebug() {
+            const debugSection = document.getElementById('debug-info');
+            const debugBtn = document.getElementById('show-debug');
+            
+            if (debugSection.style.display === 'none') {
+                debugSection.style.display = 'block';
+                debugBtn.textContent = 'Hide Debug Info';
+                updateDebugInfo();
+            } else {
+                debugSection.style.display = 'none';
+                debugBtn.textContent = 'Show Debug Info';
+            }
+        }
+        
+        function updateDebugInfo() {
+            const debugContent = document.getElementById('debug-content');
+            
+            let html = '<h4>Products Array Status:</h4>';
+            
+            // Check global products array
+            if (typeof products !== 'undefined' && Array.isArray(products)) {
+                html += `<p style="color:green">✓ Global products array exists with ${products.length} items</p>`;
+            } else {
+                html += `<p style="color:red">✗ Global products array not found or not an array</p>`;
+            }
+            
+            // Check adminProducts
+            if (typeof adminProducts !== 'undefined' && Array.isArray(adminProducts)) {
+                html += `<p style="color:green">✓ adminProducts array exists with ${adminProducts.length} items</p>`;
+                
+                if (adminProducts.length > 0) {
+                    html += `<pre style="max-height:100px;overflow:auto">${JSON.stringify(adminProducts[0], null, 2)}</pre>`;
+                }
+            } else {
+                html += `<p style="color:red">✗ adminProducts array not found or not an array</p>`;
+            }
+            
+            // Check localStorage
+            try {
+                const storedProducts = localStorage.getItem('adminProducts');
+                html += `<h4>localStorage:</h4>`;
+                html += `<p>isAdminLoggedIn: ${localStorage.getItem('isAdminLoggedIn') || 'not set'}</p>`;
+                html += `<p>adminProducts: ${storedProducts ? 'Found' : 'not set'}</p>`;
+            } catch (e) {
+                html += `<p style="color:red">Error checking localStorage: ${e.message}</p>`;
+            }
+            
+            debugContent.innerHTML = html;
+        }
+        
+        function reloadProducts() {
+            try {
+                // Force reload products.js
+                const script = document.createElement('script');
+                script.src = '../js/products.js?t=' + Date.now();
+                script.onload = function() {
+                    console.log("Products.js reloaded");
+                    if (typeof products !== 'undefined' && Array.isArray(products)) {
+                        adminProducts = JSON.parse(JSON.stringify(products));
+                        console.log("adminProducts updated with", adminProducts.length, "items");
+                        updateProductsTable();
+                        updateDebugInfo();
+                    }
+                };
+                document.head.appendChild(script);
+            } catch (e) {
+                console.error("Reload failed:", e);
+                alert("Reload failed: " + e.message);
+            }
+        }
+    </script>
+    
+    <!-- Fix for Add New Product functionality -->
+    <script>
+        // Direct Add Product handler
+        function directAddProduct() {
+            console.log("Direct add product handler triggered");
+            
+            // Get elements
+            const productForm = document.getElementById('product-form');
+            const productModal = document.getElementById('product-modal');
+            
+            if (!productForm || !productModal) {
+                console.error("Product form or modal not found");
+                alert("Error: Can't find product form or modal!");
+                return;
+            }
+            
+            // Reset form
+            productForm.reset();
+            
+            // Set title
+            const modalTitle = document.getElementById('modal-title');
+            if (modalTitle) modalTitle.textContent = 'Add New Product';
+            
+            // Make image required
+            const productImage = document.getElementById('product-image');
+            if (productImage) productImage.required = true;
+            
+            // Clear edit ID
+            productForm.dataset.editId = '';
+            
+            // Show modal
+            productModal.classList.remove('hidden');
+            console.log("Product modal opened successfully");
+        }
+        
+        // Make sure Add Product button works
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Setting up Add Product button fix");
+            
+            // Fix for the "Add New Product" button
+            const addProductBtn = document.getElementById('add-product-btn');
+            if (addProductBtn) {
+                console.log("Found Add Product button, attaching direct handler");
+                // Override any existing handlers with our direct handler
+                addProductBtn.onclick = function(e) {
+                    e.preventDefault();
+                    directAddProduct();
+                    return false;
+                };
+            } else {
+                console.warn("Add Product button not found - might be loaded later");
+                
+                // Try again after a delay
+                setTimeout(function() {
+                    const addBtn = document.getElementById('add-product-btn');
+                    if (addBtn) {
+                        console.log("Found Add Product button on second try");
+                        addBtn.onclick = directAddProduct;
+                    }
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html> 

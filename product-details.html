@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - ROA Store</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/product-details.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta property="og:title" content="ROA Store Beaded Bags">
+    <meta property="og:description" content="Handcrafted luxury beaded bags and accessories">
+    <meta property="og:image" content="images/logo.png">
+</head>
+<body>
+    <nav class="navbar">
+        <button class="hamburger" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-brand">
+            <a href="index.html">
+                <img src="images/logo.png" alt="ROA Store Logo" class="nav-logo">
+            </a>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="products.html" class="active">Shop</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="product-details-section">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> / 
+                    <a href="products.html">Shop</a> / 
+                    <span id="product-breadcrumb">Product Details</span>
+                </div>
+                
+                <div class="product-details-container">
+                    <div class="product-image-gallery">
+                        <div class="main-image">
+                            <img id="product-main-image" src="images/decoration-top-left.jpg" alt="Product Image">
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h1 id="product-name" class="product-title">Product Name</h1>
+                        <p id="product-price" class="product-price">$250</p>
+                        <div class="product-meta">
+                            <span class="category"><i class="fas fa-tag"></i> <span id="product-category">Category</span></span>
+                            <span id="product-new-tag" class="new-product-tag">New Arrival</span>
+                        </div>
+                        <div class="product-description">
+                            <h3>Description</h3>
+                            <p id="product-description">Product description goes here.</p>
+                        </div>
+                        <div class="social-sharing">
+                            <h3>Share This Product</h3>
+                            <div class="sharing-buttons">
+                                <button id="share-whatsapp" class="share-button whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                <button id="share-twitter" class="share-button twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button id="share-pinterest" class="share-button pinterest">
+                                    <i class="fab fa-pinterest"></i>
+                                </button>
+                                <button id="share-instagram" class="share-button instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </button>
+                                <button id="copy-link" class="share-button copy-link">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                                <span id="copy-feedback" class="copy-feedback">Link copied!</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a href="contact.html" class="btn-primary">Contact About This Product</a>
+                            <a href="products.html" class="btn-secondary">Back to Products</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="related-products">
+                    <h2>You May Also Like</h2>
+                    <div class="products-row" id="related-products-container">
+                        <!-- Related products will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="social-links">
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
+            </div>
+            <p>&copy; 2024 ROA Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/products.js"></script>
+    <script src="js/product-details.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 

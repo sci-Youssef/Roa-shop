@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Products Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #C5A572;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px 10px 0;
+        }
+        .card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <!-- Load products.js first -->
+    <script src="../js/products.js"></script>
+</head>
+<body>
+    <h1>ROA Store Admin Products Debug</h1>
+    
+    <div class="card">
+        <h2>Products.js Loading Status</h2>
+        <div id="loading-status">Checking products.js status...</div>
+        <button id="check-products">Check Products.js</button>
+        <div id="products-info"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Products Table Preview</h2>
+        <button id="show-table">Show Products Table</button>
+        <div id="products-table"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Fix Issues</h2>
+        <button id="generate-products">Generate Products.js Template</button>
+        <button id="clear-storage">Clear localStorage</button>
+        <div id="fix-output"></div>
+    </div>
+    
+    <script>
+        // When the document is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            checkProductsJs();
+            
+            // Event listeners
+            document.getElementById('check-products').addEventListener('click', checkProductsJs);
+            document.getElementById('show-table').addEventListener('click', showProductsTable);
+            document.getElementById('generate-products').addEventListener('click', generateProductsTemplate);
+            document.getElementById('clear-storage').addEventListener('click', clearLocalStorage);
+        });
+        
+        // Check if products.js is loaded correctly
+        function checkProductsJs() {
+            const statusElem = document.getElementById('loading-status');
+            const infoElem = document.getElementById('products-info');
+            
+            try {
+                if (typeof products !== 'undefined' && Array.isArray(products)) {
+                    statusElem.innerHTML = `<span class="success">✓ Products found! ${products.length} products available</span>`;
+                    
+                    // Display first product as example
+                    if (products.length > 0) {
+                        infoElem.innerHTML = `<h3>First Product Example:</h3>
+                            <pre>${JSON.stringify(products[0], null, 2)}</pre>`;
+                    }
+                } else {
+                    statusElem.innerHTML = `<span class="error">✗ Products array not found or not properly defined!</span>`;
+                    
+                    // Try loading products.js manually
+                    infoElem.innerHTML = `<p>Attempting to load products.js manually...</p>`;
+                    
+                    const script = document.createElement('script');
+                    script.src = '../js/products.js';
+                    script.onload = function() {
+                        if (typeof products !== 'undefined' && Array.isArray(products)) {
+                            statusElem.innerHTML = `<span class="success">✓ Products loaded manually! ${products.length} products available</span>`;
+                            infoElem.innerHTML += `<pre>${JSON.stringify(products[0], null, 2)}</pre>`;
+                        } else {
+                            infoElem.innerHTML += `<p class="error">Failed to load products from script!</p>`;
+                        }
+                    };
+                    script.onerror = function() {
+                        infoElem.innerHTML += `<p class="error">Error loading products.js file - file may not exist!</p>`;
+                    };
+                    document.head.appendChild(script);
+                }
+            } catch (error) {
+                statusElem.innerHTML = `<span class="error">✗ Error checking products: ${error.message}</span>`;
+            }
+        }
+        
+        // Show products in a table format
+        function showProductsTable() {
+            const tableElem = document.getElementById('products-table');
+            
+            if (typeof products === 'undefined' || !Array.isArray(products) || products.length === 0) {
+                tableElem.innerHTML = `<p class="error">No products available to display!</p>`;
+                return;
+            }
+            
+            // Create table
+            let tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                            <th>New?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Add rows
+            products.forEach(product => {
+                tableHTML += `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td><img src="../${product.image}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='../images/decoration-top-left.jpg'"></td>
+                        <td>${product.name}</td>
+                        <td>$${product.price}</td>
+                        <td>${product.category || 'Uncategorized'}</td>
+                        <td>${product.isNew ? 'Yes' : 'No'}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            tableElem.innerHTML = tableHTML;
+        }
+        
+        // Generate products.js template
+        function generateProductsTemplate() {
+            const outputElem = document.getElementById('fix-output');
+            
+            const sampleProducts = [
+                {
+                    id: 1,
+                    name: "Classic Beaded Handbag",
+                    price: "250",
+                    description: "Elegant beaded handbag with intricate detailing, perfect for special occasions and evening events.",
+                    category: "Bags",
+                    isNew: true,
+                    image: "images/product-1747540193076-250.jpg"
+                },
+                {
+                    id: 2,
+                    name: "Luxury Evening Clutch",
+                    price: "300",
+                    description: "Stylish beaded evening clutch with premium craftsmanship and elegant design.",
+                    category: "Accessories",
+                    isNew: false,
+                    image: "images/product-1747538660284-250.jpg"
+                }
+            ];
+            
+            const template = `// Products data - directly defined without localStorage initially
+const products = ${JSON.stringify(sampleProducts, null, 2)};
+
+// Make sure products is available globally
+if (typeof window !== 'undefined') {
+  window.products = products;
+}
+
+// Rest of your products.js file...`;
+            
+            outputElem.innerHTML = `<h3>Copy this template to your products.js file:</h3>
+                <pre>${template}</pre>`;
+        }
+        
+        // Clear localStorage
+        function clearLocalStorage() {
+            const outputElem = document.getElementById('fix-output');
+            
+            try {
+                localStorage.removeItem('adminProducts');
+                localStorage.removeItem('isAdminLoggedIn');
+                outputElem.innerHTML = `<p class="success">✓ localStorage cleared successfully!</p>`;
+            } catch (error) {
+                outputElem.innerHTML = `<p class="error">✗ Error clearing localStorage: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

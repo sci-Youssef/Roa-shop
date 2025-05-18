@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Admin Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #C5A572;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 300px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .warning {
+            color: orange;
+            font-weight: bold;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .steps {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #C5A572;
+            margin: 15px 0;
+        }
+        ol li {
+            margin-bottom: 8px;
+        }
+    </style>
+    <script src="../js/products.js"></script>
+</head>
+<body>
+    <h1>Complete Admin Fix Tool</h1>
+    <p>This tool will fix both issues: products not showing up and "Add New Product" not working.</p>
+    
+    <div class="card">
+        <h2>Step 1: Fix Admin Products</h2>
+        <div id="products-status" class="steps"></div>
+        <button id="fix-products-btn">Fix Products Now</button>
+    </div>
+    
+    <div class="card">
+        <h2>Step 2: Fix Add New Product Functionality</h2>
+        <div id="add-product-status" class="steps"></div>
+        <button id="fix-add-product-btn">Fix Add Product Functionality</button>
+    </div>
+    
+    <div class="card">
+        <h2>Step 3: Go to Admin Dashboard</h2>
+        <p>After completing steps 1 and 2, click below to go to the fixed admin dashboard.</p>
+        <button id="go-admin-btn">Go to Admin Dashboard</button>
+    </div>
+    
+    <div class="card">
+        <h2>Debug Information</h2>
+        <button id="view-debug-btn">View Debug Information</button>
+        <div id="debug-info" style="display:none;"></div>
+    </div>
+    
+    <script>
+        // Initialize variables
+        let productsFixed = false;
+        let addProductFixed = false;
+        
+        // Check if products are loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            checkProducts();
+        });
+        
+        // Check products state
+        function checkProducts() {
+            const statusDiv = document.getElementById('products-status');
+            
+            try {
+                if (typeof products !== 'undefined' && Array.isArray(products)) {
+                    statusDiv.innerHTML = `<p class="success">✓ Found ${products.length} products in global products array</p>`;
+                    
+                    // Check if adminProducts exists in localStorage
+                    const storedProducts = localStorage.getItem('adminProducts');
+                    if (storedProducts) {
+                        statusDiv.innerHTML += `<p class="success">✓ Found admin products in localStorage</p>`;
+                    } else {
+                        statusDiv.innerHTML += `<p class="warning">⚠ Admin products not found in localStorage - needs fixing</p>`;
+                    }
+                } else {
+                    statusDiv.innerHTML = `<p class="error">✗ Global products array not found or empty - needs fixing</p>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">✗ Error checking products: ${error.message}</p>`;
+            }
+        }
+        
+        // Fix products button handler
+        document.getElementById('fix-products-btn').addEventListener('click', function() {
+            const statusDiv = document.getElementById('products-status');
+            
+            try {
+                // Define default products
+                const defaultProducts = [
+                    {
+                        id: 1,
+                        name: "Classic Beaded Handbag",
+                        price: "250",
+                        description: "Elegant beaded handbag with intricate detailing, perfect for special occasions and evening events.",
+                        category: "Bags",
+                        isNew: true,
+                        image: "images/product-1747540193076-250.jpg"
+                    },
+                    {
+                        id: 2,
+                        name: "Luxury Evening Clutch",
+                        price: "300",
+                        description: "Stylish beaded evening clutch with premium craftsmanship and elegant design.",
+                        category: "Accessories",
+                        isNew: false,
+                        image: "images/product-1747538660284-250.jpg"
+                    },
+                    {
+                        id: 3,
+                        name: "ROA Signature Bag",
+                        price: "250",
+                        description: "Our signature beaded bag, perfect for any occasion with its timeless design.",
+                        category: "Bags",
+                        isNew: true,
+                        image: "images/decoration-top-left.jpg"
+                    },
+                    {
+                        id: 4,
+                        name: "Premium Beaded Collection",
+                        price: "350",
+                        description: "Part of our premium collection, featuring exquisite beadwork and luxury finishing.",
+                        category: "Luxury",
+                        isNew: true,
+                        image: "images/decoration-bottom-right.jpg"
+                    }
+                ];
+                
+                // Create global products variable if not exists
+                if (typeof products === 'undefined' || !Array.isArray(products)) {
+                    window.products = defaultProducts;
+                    statusDiv.innerHTML = `<p class="success">✓ Created global products array with default products</p>`;
+                } else {
+                    statusDiv.innerHTML = `<p class="success">✓ Using existing global products array with ${products.length} items</p>`;
+                }
+                
+                // Create adminProducts and save to localStorage
+                window.adminProducts = JSON.parse(JSON.stringify(window.products));
+                localStorage.setItem('adminProducts', JSON.stringify(window.adminProducts));
+                
+                statusDiv.innerHTML += `<p class="success">✓ Successfully copied ${window.adminProducts.length} products to adminProducts</p>`;
+                statusDiv.innerHTML += `<p class="success">✓ Saved adminProducts to localStorage</p>`;
+                
+                // Create products.js file content
+                const productsJsContent = `// Products data - directly defined without localStorage initially
+const products = ${JSON.stringify(window.products, null, 2)};
+
+// Make sure products is available globally
+if (typeof window !== 'undefined') {
+  window.products = products;
+}`;
+                
+                // Create download link for products.js
+                const blob = new Blob([productsJsContent], { type: 'text/javascript' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'products.js';
+                
+                statusDiv.innerHTML += `
+                    <p class="success">✓ Generated new products.js file</p>
+                    <p class="steps">
+                        <strong>To complete the fix:</strong><br>
+                        1. A download for the new products.js file will start<br>
+                        2. Save this file to replace your existing js/products.js file
+                    </p>
+                `;
+                
+                // Start download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                productsFixed = true;
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">✗ Error fixing products: ${error.message}</p>`;
+            }
+        });
+        
+        // Fix Add Product functionality
+        document.getElementById('fix-add-product-btn').addEventListener('click', function() {
+            const statusDiv = document.getElementById('add-product-status');
+            
+            try {
+                // Create admin.js file content with fixed add product functionality
+                const adminJsSection = `
+// Function for adding new products
+function addNewProduct() {
+    console.log('Add new product button clicked');
+    
+    // Reset form and prepare modal
+    productForm.reset();
+    document.getElementById('modal-title').textContent = 'Add New Product';
+    document.getElementById('product-image').required = true;
+    productForm.dataset.editId = '';
+    
+    // Show modal
+    productModal.classList.remove('hidden');
+}
+
+// Make sure Add Product button works
+document.addEventListener('DOMContentLoaded', function() {
+    const addProductBtn = document.getElementById('add-product-btn');
+    if (addProductBtn) {
+        addProductBtn.addEventListener('click', addNewProduct);
+        console.log('Add product button event listener attached');
+    } else {
+        console.error('Add product button not found');
+    }
+});
+`;
+                
+                const htmlSection = `
+<!-- This should be added to dashboard.html -->
+<script>
+    // Direct Add Product handler
+    function directAddProduct() {
+        console.log("Direct add product handler");
+        // Reset form
+        const productForm = document.getElementById('product-form');
+        if (productForm) productForm.reset();
+        
+        // Set title
+        const modalTitle = document.getElementById('modal-title');
+        if (modalTitle) modalTitle.textContent = 'Add New Product';
+        
+        // Make image required
+        const productImage = document.getElementById('product-image');
+        if (productImage) productImage.required = true;
+        
+        // Clear edit ID
+        if (productForm) productForm.dataset.editId = '';
+        
+        // Show modal
+        const productModal = document.getElementById('product-modal');
+        if (productModal) {
+            productModal.classList.remove('hidden');
+            console.log("Modal displayed");
+        } else {
+            console.error("Product modal not found");
+        }
+    }
+    
+    // Backup solution if regular button doesn't work
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.getElementById('add-product-btn');
+        if (addBtn) {
+            addBtn.onclick = directAddProduct;
+            console.log("Direct handler attached to add product button");
+        }
+    });
+</script>
+`;
+                
+                statusDiv.innerHTML = `
+                    <p class="success">✓ Generated fix for Add Product functionality</p>
+                    <p>To fix the Add Product button, you have two options:</p>
+                    
+                    <p><strong>Option 1:</strong> Add this code to the end of admin/admin.js:</p>
+                    <pre>${adminJsSection}</pre>
+                    
+                    <p><strong>Option 2:</strong> Add this code to the end of admin/dashboard.html (before the closing body tag):</p>
+                    <pre>${htmlSection}</pre>
+                    
+                    <p class="success">✓ When you go to the admin dashboard, click the "Add New Product" button with the plus icon.</p>
+                `;
+                
+                addProductFixed = true;
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">✗ Error fixing add product functionality: ${error.message}</p>`;
+            }
+        });
+        
+        // Go to admin dashboard
+        document.getElementById('go-admin-btn').addEventListener('click', function() {
+            if (!productsFixed) {
+                alert('Please complete Step 1 first to fix products!');
+                return;
+            }
+            
+            if (!addProductFixed) {
+                const proceed = confirm('You haven\'t completed Step 2 yet. The "Add New Product" button might not work. Proceed anyway?');
+                if (!proceed) return;
+            }
+            
+            window.location.href = 'dashboard.html';
+        });
+        
+        // View debug information
+        document.getElementById('view-debug-btn').addEventListener('click', function() {
+            const debugDiv = document.getElementById('debug-info');
+            if (debugDiv.style.display === 'none') {
+                debugDiv.style.display = 'block';
+                this.textContent = 'Hide Debug Information';
+                
+                // Generate debug info
+                try {
+                    let debugHTML = '<h3>Global Variables:</h3>';
+                    
+                    // Check products
+                    if (typeof products !== 'undefined') {
+                        debugHTML += `<p class="success">✓ Global products array: ${Array.isArray(products) ? products.length + ' items' : 'Not an array'}</p>`;
+                        if (Array.isArray(products) && products.length > 0) {
+                            debugHTML += `<pre>${JSON.stringify(products[0], null, 2)}</pre>`;
+                        }
+                    } else {
+                        debugHTML += `<p class="error">✗ Global products array: undefined</p>`;
+                    }
+                    
+                    // Check adminProducts
+                    if (typeof adminProducts !== 'undefined') {
+                        debugHTML += `<p class="success">✓ Global adminProducts array: ${Array.isArray(adminProducts) ? adminProducts.length + ' items' : 'Not an array'}</p>`;
+                    } else {
+                        debugHTML += `<p class="error">✗ Global adminProducts array: undefined</p>`;
+                    }
+                    
+                    // Check localStorage
+                    debugHTML += '<h3>localStorage:</h3>';
+                    try {
+                        const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+                        const storedProducts = localStorage.getItem('adminProducts');
+                        
+                        debugHTML += `<p>isAdminLoggedIn: ${isLoggedIn || 'not set'}</p>`;
+                        debugHTML += `<p>adminProducts: ${storedProducts ? 'Found' : 'not set'}</p>`;
+                        
+                        if (storedProducts) {
+                            try {
+                                const parsedProducts = JSON.parse(storedProducts);
+                                debugHTML += `<p>Number of stored products: ${parsedProducts.length}</p>`;
+                            } catch (e) {
+                                debugHTML += `<p class="error">Error parsing stored products: ${e.message}</p>`;
+                            }
+                        }
+                    } catch (e) {
+                        debugHTML += `<p class="error">Error accessing localStorage: ${e.message}</p>`;
+                    }
+                    
+                    debugDiv.innerHTML = debugHTML;
+                } catch (error) {
+                    debugDiv.innerHTML = `<p class="error">Error generating debug info: ${error.message}</p>`;
+                }
+            } else {
+                debugDiv.style.display = 'none';
+                this.textContent = 'View Debug Information';
+            }
+        });
+    </script>
+</body>
+</html> 

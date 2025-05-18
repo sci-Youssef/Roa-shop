@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Admin Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            background-color: #C5A572;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+    </style>
+    <script src="../js/products.js"></script>
+</head>
+<body>
+    <h1>Direct Admin Fix</h1>
+    <p>This page will fix the issue where products aren't showing up in the admin panel.</p>
+    
+    <div id="status"></div>
+    
+    <button id="fix-btn">Fix Admin Products</button>
+    <button id="view-products">View Current Products</button>
+    <button id="go-admin">Go to Admin Panel</button>
+    
+    <div id="products-display"></div>
+    
+    <script>
+        // Check if products are loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusDiv = document.getElementById('status');
+            
+            if (typeof products !== 'undefined' && Array.isArray(products)) {
+                statusDiv.innerHTML = `<p class="success">✓ Found ${products.length} products in global products array</p>`;
+            } else {
+                statusDiv.innerHTML = `<p class="error">✗ Global products array not found or empty</p>`;
+            }
+        });
+        
+        // Fix button handler
+        document.getElementById('fix-btn').addEventListener('click', function() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                if (typeof products !== 'undefined' && Array.isArray(products)) {
+                    // Create a deep copy of products
+                    const adminProducts = JSON.parse(JSON.stringify(products));
+                    
+                    // Store in localStorage
+                    localStorage.setItem('adminProducts', JSON.stringify(adminProducts));
+                    
+                    // Also create a global variable for immediate use
+                    window.adminProducts = adminProducts;
+                    
+                    statusDiv.innerHTML = `
+                        <p class="success">✓ Successfully copied ${products.length} products to adminProducts</p>
+                        <p>The adminProducts array is now available in localStorage and as a global variable.</p>
+                        <p>You can now return to the admin panel and the products should display correctly.</p>
+                    `;
+                } else {
+                    // Create a fallback product array
+                    const fallbackProducts = [
+                        {
+                            id: 1,
+                            name: "Classic Beaded Handbag",
+                            price: "250",
+                            description: "Elegant beaded handbag with intricate detailing, perfect for special occasions and evening events.",
+                            category: "Bags",
+                            isNew: true,
+                            image: "images/product-1747540193076-250.jpg"
+                        },
+                        {
+                            id: 2,
+                            name: "Luxury Evening Clutch",
+                            price: "300",
+                            description: "Stylish beaded evening clutch with premium craftsmanship and elegant design.",
+                            category: "Accessories",
+                            isNew: false,
+                            image: "images/product-1747538660284-250.jpg"
+                        }
+                    ];
+                    
+                    localStorage.setItem('adminProducts', JSON.stringify(fallbackProducts));
+                    window.adminProducts = fallbackProducts;
+                    
+                    statusDiv.innerHTML = `
+                        <p class="success">✓ Created fallback products (2 items) since global products array is unavailable</p>
+                        <p>You can now return to the admin panel and the fallback products should display.</p>
+                    `;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">✗ Error fixing admin products: ${error.message}</p>`;
+            }
+        });
+        
+        // View products button
+        document.getElementById('view-products').addEventListener('click', function() {
+            const displayDiv = document.getElementById('products-display');
+            
+            try {
+                // Check global products
+                if (typeof products !== 'undefined' && Array.isArray(products)) {
+                    displayDiv.innerHTML = `
+                        <h3>Global Products (${products.length} items):</h3>
+                        <pre>${JSON.stringify(products, null, 2)}</pre>
+                    `;
+                } else {
+                    displayDiv.innerHTML = `<p class="error">No global products found</p>`;
+                }
+                
+                // Check localStorage
+                const storedProducts = localStorage.getItem('adminProducts');
+                if (storedProducts) {
+                    try {
+                        const parsedProducts = JSON.parse(storedProducts);
+                        displayDiv.innerHTML += `
+                            <h3>Stored Admin Products (${parsedProducts.length} items):</h3>
+                            <pre>${JSON.stringify(parsedProducts, null, 2)}</pre>
+                        `;
+                    } catch (e) {
+                        displayDiv.innerHTML += `<p class="error">Error parsing stored products: ${e.message}</p>`;
+                    }
+                } else {
+                    displayDiv.innerHTML += `<p class="error">No stored admin products found</p>`;
+                }
+            } catch (error) {
+                displayDiv.innerHTML = `<p class="error">Error viewing products: ${error.message}</p>`;
+            }
+        });
+        
+        // Go to admin
+        document.getElementById('go-admin').addEventListener('click', function() {
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html> 
