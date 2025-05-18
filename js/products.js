@@ -34,7 +34,7 @@ const products = [
     "description": "Part of our premium collection, featuring exquisite beadwork and luxury finishing.",
     "category": "Luxury",
     "isNew": true,
-    "image": "images/products/350-1.jpg"
+    "image": "images/products/350.jpg"
   },
   {
     "id": 5,
@@ -52,7 +52,7 @@ const products = [
     "description": "A spacious and luxurious beaded tote with intricate patterns, suitable for day or evening use.",
     "category": "Luxury",
     "isNew": false,
-    "image": "images/products/450-3.jpg"
+    "image": "images/products/450-1.jpg"
   },
   {
     "id": 7,
@@ -75,7 +75,7 @@ const products = [
   {
     "id": 9,
     "name": "Bohemian Beaded Clutch",
-    "price": "275",
+    "price": "250",
     "description": "A bohemian-inspired beaded clutch with colorful patterns, perfect for adding a pop of color to any outfit.",
     "category": "Accessories",
     "isNew": true,
@@ -84,11 +84,11 @@ const products = [
   {
     "id": 10,
     "name": "Limited Edition Evening Bag",
-    "price": "500",
+    "price": "450",
     "description": "A limited edition evening bag with rare beads and exquisite craftsmanship, perfect for special occasions.",
     "category": "Luxury",
     "isNew": true,
-    "image": "images/products/450-5.jpg"
+    "image": "images/products/450-2.jpg"
   },
   {
     "id": 11,
@@ -102,7 +102,7 @@ const products = [
   {
     "id": 12,
     "name": "Mini Beaded Bag",
-    "price": "180",
+    "price": "150",
     "description": "A mini beaded bag with a detachable chain strap, perfect for a night out or special event.",
     "category": "Accessories",
     "isNew": true,
@@ -111,7 +111,7 @@ const products = [
   {
     "id": 13,
     "name": "Vintage Inspired Clutch",
-    "price": "320",
+    "price": "300",
     "description": "A vintage-inspired clutch featuring antique beading patterns and classic design elements.",
     "category": "Bags",
     "isNew": false,
@@ -120,7 +120,7 @@ const products = [
   {
     "id": 14,
     "name": "Festival Beaded Bag",
-    "price": "275",
+    "price": "450",
     "description": "A colorful and fun beaded bag designed for festival season, featuring vibrant patterns and secure closures.",
     "category": "Accessories",
     "isNew": true,
